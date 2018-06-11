@@ -1,0 +1,132 @@
+PARSER_BEGIN(KotlinFunctionsParser)
+
+public class KotlinFunctionsParser {
+    public static void main(String[] args) {
+        KotlinFunctionsParser lex = null;
+      
+        System.out.println("Reading from file " + args[0]);
+        try {
+            lex = new KotlinFunctionsParser(new java.io.FileInputStream(args[0]));
+        }
+        catch(java.io.FileNotFoundException e) {
+            System.out.println("Error in reading file");
+        }
+        
+        
+        try {
+            lex.Start();
+            System.out.println("Lexical analyzing was done successfully");
+        }
+        catch(ParseException e) {
+            System.out.println("Error in parsing");
+            System.out.println(e.getMessage());
+        }
+        catch(TokenMgrError e) {
+            System.out.println("There was an error in analyzing the code");
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+PARSER_END(KotlinFunctionsParser)
+
+SKIP: {
+    " "
+|   "\t"
+|   "\n"
+|   "\r"
+|   <"//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
+}
+
+// Reserved words and operators
+TOKEN: {
+    <LB: "(">
+|   <RB: ")">
+|   <COMMA: ",">
+|   <EQUALS: "=">
+|   <SEMI: ":">
+|	<FUN: "fun">
+|	<INTEGER: "Int">
+|	<DOUBLE: "Double">
+|	<UNIT: "Unit">
+|	<PRINT: "print()">
+|	<RETURN:"return">
+|   <CLB: "{">
+|   <CRB: "}">
+
+}   
+
+// Identifiers etc.
+TOKEN: {
+    <#LETTER: ["a"-"z", "A"-"Z"]>
+|   <#DIGIT: ["0"-"9"]>
+|   <NAME: <LETTER>(<DIGIT> | "_" | <LETTER>)*>
+|   <NUM: (<DIGIT>)+>
+
+}
+
+void Start() : {}
+{
+   ( begin() )*
+   <EOF>
+}
+
+void begin(): {}
+{
+    <FUN> <NAME> <LB> parmeter() <RB> end()
+}
+
+void parmeter(): {}
+{
+    <NAME> <SEMI> kind() reset() moreParmetr()
+|   {} 
+}
+
+void moreParmetr() : {}
+{
+    <COMMA> <NAME> <SEMI> kind() reset() moreParmetr()
+|	{}
+}
+
+void reset(): {}
+{
+    <EQUALS><NUM>
+|	{}
+}
+
+void kind(): {}
+{
+	<DOUBLE>
+|	<INTEGER>
+}
+void back(): {}
+{
+    <SEMI> kind()
+|   <UNIT>
+|    {}
+}
+
+void end(): {}
+{
+    back()<CLB> body() <CRB>
+|   <EQUALS> fun_body() 
+}
+
+void return_body(): {}
+{
+    <NAME>
+|   <NUM>
+}
+
+void fun_body() : {}
+{
+    <PRINT>
+|   <NAME><EQUALS><NUM>
+|   <RETURN> return_body()
+}
+void body() : {}
+{
+    fun_body()  body()
+|   {}
+
+}

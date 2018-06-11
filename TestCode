@@ -1,0 +1,45 @@
+
+// 
+// Kotlin Functions
+// Legal functions declarations
+fun f1() {
+    print()
+}
+
+fun f2(x : Int) : Int {
+    x = 4
+}
+
+fun f3(x: Int, y: Double) : Double {
+    print()
+    x = 5
+    return y
+}
+
+// omit returned value
+fun f4() {
+    print()
+}
+
+// Default values
+fun f5(x: Int = 0, y: Double, z: Int = 88) : Int {
+    print()
+    print()
+    return 6
+}
+
+fun f6(age : Int = 4) {
+    print()
+}
+
+// one expression function
+fun f7(width : Double, height: Double) = return 10
+
+fun f8(x : Int) = print()
+
+
+
+
+// isn't a one-statement function
+fun g5() = print()
+            return 4
